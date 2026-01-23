@@ -1,0 +1,23 @@
+spring:
+  profiles:
+    active: dev
+
+server:
+  servlet:
+    context-path: /api
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+security:
+  jwt:
+    secret: mall-system-jwt-secret-key-please-change-20260101
+    access-token-ttl-minutes: 30
+    refresh-token-ttl-days: 7
