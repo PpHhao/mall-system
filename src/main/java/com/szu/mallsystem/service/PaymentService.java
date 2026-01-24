@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.szu.mallsystem.dto.payment.CreatePaymentRequest;
 import com.szu.mallsystem.dto.payment.PaymentCallbackRequest;
 import com.szu.mallsystem.dto.payment.QueryPaymentRequest;
+import com.szu.mallsystem.entity.Payment;
 import com.szu.mallsystem.vo.PaymentVO;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -15,7 +16,7 @@ import java.util.Map;
 /**
  * 支付服务接口
  */
-public interface PaymentService extends IService {
+public interface PaymentService extends IService<Payment> {
 
     /**
      * 创建支付

@@ -4,12 +4,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.szu.mallsystem.dto.payment.ProcessRefundRequest;
 import com.szu.mallsystem.dto.payment.RefundRequest;
+import com.szu.mallsystem.entity.Refund;
 import com.szu.mallsystem.vo.RefundVO;
 
 /**
  * 退款服务接口
  */
-public interface RefundService extends IService {
+public interface RefundService extends IService<Refund> {
 
     /**
      * 申请退款

@@ -19,6 +19,10 @@ public class Order {
     @TableField("order_no")
     private String orderNo;
 
+<<<<<<< HEAD
+=======
+    @TableField("user_id")
+>>>>>>> b6ea818e210de9f0e9ea2c0ac7740267552b4280
     private Long userId;
 
     private Integer status;
@@ -32,6 +36,10 @@ public class Order {
     @TableField("pay_amount")
     private BigDecimal payAmount;
 
+<<<<<<< HEAD
+=======
+    @TableField("pay_method")
+>>>>>>> b6ea818e210de9f0e9ea2c0ac7740267552b4280
     private Integer payMethod;
 
     @TableField("paid_at")

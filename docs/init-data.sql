@@ -1,5 +1,6 @@
 -- Mall System 初始数据（执行前确认已创建 mall_system 数据库并建好表）
 SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS=0;
 USE mall_system;
 
 -- 1) 角色
@@ -183,3 +184,4 @@ INSERT INTO product_images (id, product_id, url, sort) VALUES
 --   - 样例商品20个，涵盖各分类
 --   - 每个商品至少配有1张图片
 --   - 依据业务扩展时，请继续在 permissions、roles、role_permissions 中补充对应编码。
+SET FOREIGN_KEY_CHECKS=1;
