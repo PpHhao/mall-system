@@ -187,9 +187,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void updateLastLogin(Long userId) {
-        lambdaUpdate()
-                .eq(User::getId, userId)
-                .set(User::getLastLoginAt, LocalDateTime.now())
-                .update();
+        User user = new User();
+        user.setId(userId);
+        user.setLastLoginAt(LocalDateTime.now());
+        // 使用updateById更新，只更新lastLoginAt字段
+        baseMapper.updateById(user);
     }
 }

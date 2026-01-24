@@ -35,9 +35,10 @@ CREATE TABLE `addresses` (
   `city` varchar(50) NOT NULL COMMENT '市',
   `district` varchar(50) NOT NULL COMMENT '区',
   `detail` varchar(255) NOT NULL COMMENT '详细地址',
-  `postal_code` varchar(20) DEFAULT NULL COMMENT AS `邮编`,
-  `is_default` tinyint(4) NOT NULL DEFAULT '0'COMMENT
-) ;
+  `postal_code` varchar(20) DEFAULT NULL COMMENT '邮编',
+  `is_default` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否默认地址',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='地址表';
 
 -- --------------------------------------------------------
 
@@ -51,9 +52,10 @@ CREATE TABLE `cart_items` (
   `product_id` bigint(20) UNSIGNED NOT NULL COMMENT '商品ID',
   `quantity` int(11) NOT NULL DEFAULT '1' COMMENT '数量',
   `checked` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否勾选：1是 0否',
-  `price_at_add` decimal(10,2) DEFAULT NULL COMMENT AS `加入时价格（可选）`,
+  `price_at_add` decimal(10,2) DEFAULT NULL COMMENT '加入时价格（可选）',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='购物车表';
 
 -- --------------------------------------------------------
@@ -64,8 +66,10 @@ CREATE TABLE `cart_items` (
 
 CREATE TABLE `categories` (
   `id` bigint(20) UNSIGNED NOT NULL COMMENT '分类ID',
-  `parent_id` bigint(20) UNSIGNED NOT NULL DEFAULT '0'COMMENT
-) ;
+  `parent_id` bigint(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT '父分类ID',
+  `name` varchar(50) NOT NULL COMMENT '分类名称',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='分类表';
 
 -- --------------------------------------------------------
 
@@ -75,14 +79,15 @@ CREATE TABLE `categories` (
 
 CREATE TABLE `files` (
   `id` bigint(20) UNSIGNED NOT NULL COMMENT '文件ID',
-  `user_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT AS `上传者用户ID（可选）`,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT '上传者用户ID（可选）',
   `biz_type` varchar(32) NOT NULL COMMENT '业务类型：product/user/review等',
   `biz_id` bigint(20) UNSIGNED NOT NULL COMMENT '业务ID',
   `url` varchar(255) NOT NULL COMMENT '文件URL',
-  `original_name` varchar(255) DEFAULT NULL COMMENT AS `原始文件名`,
-  `mime_type` varchar(100) DEFAULT NULL COMMENT AS `MIME类型`,
-  `size_bytes` int(10) UNSIGNED DEFAULT NULL COMMENT AS `文件大小（字节）`,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `original_name` varchar(255) DEFAULT NULL COMMENT '原始文件名',
+  `mime_type` varchar(100) DEFAULT NULL COMMENT 'MIME类型',
+  `size_bytes` int(10) UNSIGNED DEFAULT NULL COMMENT '文件大小（字节）',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件表（可选）';
 
 -- --------------------------------------------------------
@@ -97,24 +102,28 @@ CREATE TABLE `orders` (
   `user_id` bigint(20) UNSIGNED NOT NULL COMMENT '用户ID',
   `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '订单状态：1待支付 2已支付 3已发货 4已完成 5已取消',
   `total_amount` decimal(10,2) NOT NULL COMMENT '商品总金额',
-  `freight_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '运费（可选）',
+  `freight_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '运费',
   `pay_amount` decimal(10,2) NOT NULL COMMENT '应付金额',
-  `pay_method` tinyint(4) DEFAULT NULL COMMENT AS `支付方式：1模拟 2支付宝(模拟) 3微信(模拟)`,
-  `paid_at` datetime DEFAULT NULL COMMENT AS `支付时间`,
-  `shipped_at` datetime DEFAULT NULL COMMENT AS `发货时间`,
-  `completed_at` datetime DEFAULT NULL COMMENT AS `完成时间`,
-  `canceled_at` datetime DEFAULT NULL COMMENT AS `取消时间`,
-  `cancel_reason` varchar(255) DEFAULT NULL COMMENT AS `取消原因`,
+  `pay_method` tinyint(4) DEFAULT NULL COMMENT '支付方式：1模拟 2支付宝(模拟) 3微信(模拟)',
+  `paid_at` datetime DEFAULT NULL COMMENT '支付时间',
+  `shipped_at` datetime DEFAULT NULL COMMENT '发货时间',
+  `completed_at` datetime DEFAULT NULL COMMENT '完成时间',
+  `canceled_at` datetime DEFAULT NULL COMMENT '取消时间',
+  `cancel_reason` varchar(255) DEFAULT NULL COMMENT '取消原因',
   `receiver_name` varchar(50) NOT NULL COMMENT '收货人',
   `receiver_phone` varchar(20) NOT NULL COMMENT '收货电话',
   `province` varchar(50) NOT NULL COMMENT '省',
   `city` varchar(50) NOT NULL COMMENT '市',
   `district` varchar(50) NOT NULL COMMENT '区',
   `detail` varchar(255) NOT NULL COMMENT '详细地址',
-  `postal_code` varchar(20) DEFAULT NULL COMMENT AS `邮编`,
-  `remark` varchar(255) DEFAULT NULL COMMENT AS `买家备注`,
-  `deleted` tinyint(4) NOT NULL DEFAULT '0'COMMENT
-) ;
+  `postal_code` varchar(20) DEFAULT NULL COMMENT '邮编',
+  `remark` varchar(255) DEFAULT NULL COMMENT '买家备注',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否删除',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_order_no` (`order_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';
 
 -- --------------------------------------------------------
 
@@ -127,11 +136,12 @@ CREATE TABLE `order_items` (
   `order_id` bigint(20) UNSIGNED NOT NULL COMMENT '订单ID',
   `product_id` bigint(20) UNSIGNED NOT NULL COMMENT '商品ID',
   `product_name` varchar(200) NOT NULL COMMENT '商品名称快照',
-  `product_image` varchar(255) DEFAULT NULL COMMENT AS `商品图片快照`,
+  `product_image` varchar(255) DEFAULT NULL COMMENT '商品图片快照',
   `unit_price` decimal(10,2) NOT NULL COMMENT '成交单价',
   `quantity` int(11) NOT NULL COMMENT '购买数量',
   `total_price` decimal(10,2) NOT NULL COMMENT '明细小计',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单商品明细表';
 
 -- --------------------------------------------------------
@@ -148,8 +158,11 @@ CREATE TABLE `payments` (
   `pay_no` varchar(64) NOT NULL COMMENT '支付单号（业务唯一）',
   `pay_method` tinyint(4) NOT NULL DEFAULT '1' COMMENT '支付方式：1模拟 2支付宝(模拟) 3微信(模拟)',
   `amount` decimal(10,2) NOT NULL COMMENT '支付金额',
-  `status` tinyint(4) NOT NULL DEFAULT '0'COMMENT
-) ;
+  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态：0未支付 1已支付 2退款中 3已退款',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_pay_no` (`pay_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付记录表';
 
 -- --------------------------------------------------------
 
@@ -162,10 +175,11 @@ CREATE TABLE `permissions` (
   `code` varchar(100) NOT NULL COMMENT '权限编码（如 product:read）',
   `name` varchar(100) NOT NULL COMMENT '权限名称',
   `type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '类型：1API 2菜单/页面（可选）',
-  `http_method` varchar(10) DEFAULT NULL COMMENT AS `HTTP方法（可选）`,
-  `http_path` varchar(255) DEFAULT NULL COMMENT AS `接口路径（可选）`,
+  `http_method` varchar(10) DEFAULT NULL COMMENT 'HTTP方法（可选）',
+  `http_path` varchar(255) DEFAULT NULL COMMENT '接口路径（可选）',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限表';
 
 --
@@ -190,11 +204,15 @@ CREATE TABLE `products` (
   `id` bigint(20) UNSIGNED NOT NULL COMMENT '商品ID',
   `category_id` bigint(20) UNSIGNED NOT NULL COMMENT '分类ID',
   `name` varchar(200) NOT NULL COMMENT '商品名称',
-  `subtitle` varchar(200) DEFAULT NULL COMMENT AS `副标题/卖点`,
+  `subtitle` varchar(200) DEFAULT NULL COMMENT '副标题/卖点',
   `description` text COMMENT '商品详情描述',
   `price` decimal(10,2) NOT NULL COMMENT '售价',
-  `stock` int(11) NOT NULL DEFAULT '0'COMMENT
-) ;
+  `stock` int(11) NOT NULL DEFAULT '0' COMMENT '库存',
+  `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态：1上架 2下架',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
 
 -- --------------------------------------------------------
 
@@ -206,8 +224,9 @@ CREATE TABLE `product_images` (
   `id` bigint(20) UNSIGNED NOT NULL COMMENT '图片ID',
   `product_id` bigint(20) UNSIGNED NOT NULL COMMENT '商品ID',
   `url` varchar(255) NOT NULL COMMENT '图片URL',
-  `sort` int(11) NOT NULL DEFAULT '0'COMMENT
-) ;
+  `sort` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品图片表';
 
 -- --------------------------------------------------------
 
@@ -221,8 +240,12 @@ CREATE TABLE `refunds` (
   `order_id` bigint(20) UNSIGNED NOT NULL COMMENT '订单ID',
   `refund_no` varchar(64) NOT NULL COMMENT '退款单号（业务唯一）',
   `amount` decimal(10,2) NOT NULL COMMENT '退款金额',
-  `status` tinyint(4) NOT NULL DEFAULT '0'COMMENT
-) ;
+  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态：0申请中 1已通过 2已拒绝 3已完成',
+  `reason` varchar(255) DEFAULT NULL COMMENT '退款原因',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_refund_no` (`refund_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='退款记录表';
 
 -- --------------------------------------------------------
 
@@ -232,16 +255,17 @@ CREATE TABLE `refunds` (
 
 CREATE TABLE `reviews` (
   `id` bigint(20) UNSIGNED NOT NULL COMMENT '评价ID',
-  `order_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT AS `订单ID（可选）`,
-  `order_item_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT AS `订单明细ID（可选）`,
+  `order_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT '订单ID（可选）',
+  `order_item_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT '订单明细ID（可选）',
   `product_id` bigint(20) UNSIGNED NOT NULL COMMENT '商品ID',
   `user_id` bigint(20) UNSIGNED NOT NULL COMMENT '评价人ID',
   `rating` tinyint(4) NOT NULL COMMENT '评分：1~5',
-  `content` varchar(1000) DEFAULT NULL COMMENT AS `评价内容`,
+  `content` varchar(1000) DEFAULT NULL COMMENT '评价内容',
   `images` text COMMENT '图片列表（JSON字符串）',
   `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态：1正常 2隐藏 3删除(逻辑)',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品评价表';
 
 -- --------------------------------------------------------
@@ -281,8 +305,10 @@ CREATE TABLE `review_reports` (
   `review_id` bigint(20) UNSIGNED NOT NULL COMMENT '评价ID',
   `user_id` bigint(20) UNSIGNED NOT NULL COMMENT '举报人ID',
   `reason` varchar(255) NOT NULL COMMENT '举报原因',
-  `status` tinyint(4) NOT NULL DEFAULT '0'COMMENT
-) ;
+  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态：0待处理 1已处理',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评价举报表';
 
 -- --------------------------------------------------------
 
@@ -294,9 +320,10 @@ CREATE TABLE `roles` (
   `id` bigint(20) UNSIGNED NOT NULL COMMENT '角色ID',
   `code` varchar(50) NOT NULL COMMENT '角色编码（如 ADMIN/USER）',
   `name` varchar(50) NOT NULL COMMENT '角色名称',
-  `remark` varchar(255) DEFAULT NULL COMMENT AS `备注`,
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
 
 --
@@ -344,12 +371,19 @@ CREATE TABLE `users` (
   `id` bigint(20) UNSIGNED NOT NULL COMMENT '用户ID',
   `username` varchar(50) NOT NULL COMMENT '用户名（登录用）',
   `password_hash` varchar(100) NOT NULL COMMENT '密码哈希（BCrypt等）',
-  `email` varchar(100) DEFAULT NULL COMMENT AS `邮箱`,
-  `phone` varchar(20) DEFAULT NULL COMMENT AS `手机号`,
-  `nickname` varchar(50) DEFAULT NULL COMMENT AS `昵称`,
-  `avatar_url` varchar(255) DEFAULT NULL COMMENT AS `头像URL`,
-  `gender` tinyint(4) NOT NULL DEFAULT '0'COMMENT
-) ;
+  `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
+  `phone` varchar(20) DEFAULT NULL COMMENT '手机号',
+  `nickname` varchar(50) DEFAULT NULL COMMENT '昵称',
+  `avatar_url` varchar(255) DEFAULT NULL COMMENT '头像URL',
+  `gender` tinyint(4) NOT NULL DEFAULT '0' COMMENT '性别：0未知 1男 2女',
+  `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态：0禁用 1正常',
+  `last_login_at` datetime DEFAULT NULL COMMENT '最后登录时间',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否删除',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 --
 -- 转存表中的数据 `users`
@@ -391,12 +425,22 @@ CREATE TABLE `user_tokens` (
   `jti` varchar(64) NOT NULL COMMENT 'JWT ID（唯一标识）',
   `token_type` tinyint(4) NOT NULL DEFAULT '2' COMMENT '类型：1access 2refresh',
   `expired_at` datetime NOT NULL COMMENT '过期时间',
-  `revoked` tinyint(4) NOT NULL DEFAULT '0'COMMENT
-) ;
+  `revoked` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否撤销',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_jti` (`jti`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户Token表';
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `addresses`
+--
+ALTER TABLE `addresses`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_addresses_user` (`user_id`);
 
 --
 -- Indexes for table `cart_items`
@@ -408,12 +452,20 @@ ALTER TABLE `cart_items`
   ADD KEY `fk_cart_product` (`product_id`);
 
 --
--- Indexes for table `files`
+-- Indexes for table `categories`
 --
-ALTER TABLE `files`
+ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_files_biz` (`biz_type`,`biz_id`),
-  ADD KEY `idx_files_user` (`user_id`);
+  ADD KEY `idx_categories_parent` (`parent_id`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uk_order_no` (`order_no`),
+  ADD KEY `idx_orders_user` (`user_id`),
+  ADD KEY `idx_orders_status` (`status`);
 
 --
 -- Indexes for table `order_items`
@@ -422,6 +474,56 @@ ALTER TABLE `order_items`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_order_items_order` (`order_id`),
   ADD KEY `idx_order_items_product` (`product_id`);
+
+--
+-- Indexes for table `payments`
+--
+ALTER TABLE `payments`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uk_pay_no` (`pay_no`),
+  ADD KEY `idx_payments_order` (`order_id`),
+  ADD KEY `idx_payments_user` (`user_id`);
+
+--
+-- Indexes for table `files`
+--
+ALTER TABLE `files`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_files_biz` (`biz_type`,`biz_id`),
+  ADD KEY `idx_files_user` (`user_id`),
+  ADD KEY `fk_files_user` (`user_id`);
+
+--
+-- Indexes for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_order_items_order` (`order_id`),
+  ADD KEY `idx_order_items_product` (`product_id`);
+
+--
+-- Indexes for table `products`
+--
+ALTER TABLE `products`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_products_category` (`category_id`),
+  ADD KEY `idx_products_status` (`status`);
+
+--
+-- Indexes for table `product_images`
+--
+ALTER TABLE `product_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_product_images_product` (`product_id`);
+
+--
+-- Indexes for table `refunds`
+--
+ALTER TABLE `refunds`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uk_refund_no` (`refund_no`),
+  ADD KEY `idx_refunds_order` (`order_id`),
+  ADD KEY `idx_refunds_payment` (`payment_id`);
 
 --
 -- Indexes for table `permissions`
@@ -451,6 +553,14 @@ ALTER TABLE `review_likes`
   ADD KEY `idx_review_likes_user` (`user_id`);
 
 --
+-- Indexes for table `review_reports`
+--
+ALTER TABLE `review_reports`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_review_reports_review` (`review_id`),
+  ADD KEY `idx_review_reports_user` (`user_id`);
+
+--
 -- Indexes for table `review_replies`
 --
 ALTER TABLE `review_replies`
@@ -464,6 +574,23 @@ ALTER TABLE `review_replies`
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uk_roles_code` (`code`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uk_username` (`username`),
+  ADD KEY `idx_users_email` (`email`),
+  ADD KEY `idx_users_phone` (`phone`);
+
+--
+-- Indexes for table `user_tokens`
+--
+ALTER TABLE `user_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uk_jti` (`jti`),
+  ADD KEY `idx_user_tokens_user` (`user_id`);
 
 --
 -- Indexes for table `role_permissions`
@@ -573,6 +700,18 @@ ALTER TABLE `user_tokens`
 --
 
 --
+-- 限制表 `addresses`
+--
+ALTER TABLE `addresses`
+  ADD CONSTRAINT `fk_addresses_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- 限制表 `categories`
+--
+ALTER TABLE `categories`
+  ADD CONSTRAINT `fk_categories_parent` FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- 限制表 `cart_items`
 --
 ALTER TABLE `cart_items`
@@ -586,11 +725,50 @@ ALTER TABLE `files`
   ADD CONSTRAINT `fk_files_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
+-- 限制表 `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `fk_orders_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- 限制表 `order_items`
 --
 ALTER TABLE `order_items`
   ADD CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_order_items_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON UPDATE CASCADE;
+
+--
+-- 限制表 `payments`
+--
+ALTER TABLE `payments`
+  ADD CONSTRAINT `fk_payments_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_payments_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- 限制表 `products`
+--
+ALTER TABLE `products`
+  ADD CONSTRAINT `fk_products_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- 限制表 `product_images`
+--
+ALTER TABLE `product_images`
+  ADD CONSTRAINT `fk_product_images_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- 限制表 `refunds`
+--
+ALTER TABLE `refunds`
+  ADD CONSTRAINT `fk_refunds_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_refunds_payment` FOREIGN KEY (`payment_id`) REFERENCES `payments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- 限制表 `review_reports`
+--
+ALTER TABLE `review_reports`
+  ADD CONSTRAINT `fk_review_reports_review` FOREIGN KEY (`review_id`) REFERENCES `reviews` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_review_reports_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- 限制表 `reviews`
@@ -628,6 +806,12 @@ ALTER TABLE `role_permissions`
 ALTER TABLE `user_roles`
   ADD CONSTRAINT `fk_user_roles_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_user_roles_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- 限制表 `user_tokens`
+--
+ALTER TABLE `user_tokens`
+  ADD CONSTRAINT `fk_user_tokens_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
