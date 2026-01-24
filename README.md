@@ -68,3 +68,53 @@ resources
 - 增强异常与审计：接口操作日志、登录失败告警、令牌黑名单清理任务等。
 
 
+
+## Swagger API Documentation
+- UI: `http://localhost:8080/api/swagger-ui/index.html`
+- OpenAPI JSON: `http://localhost:8080/api/v3/api-docs`
+- OpenAPI YAML: `http://localhost:8080/api/v3/api-docs.yaml`
+- Export JSON to file:
+  ```bash
+  curl http://localhost:8080/api/v3/api-docs -o docs/openapi.json
+  ```
+- Export YAML to file:
+  ```bash
+  curl http://localhost:8080/api/v3/api-docs.yaml -o docs/openapi.yaml
+  ```
+
+## 订单模块接口（Swagger 为准）
+- 购物车：
+  - `GET /api/cart`
+  - `POST /api/cart/items`
+  - `PUT /api/cart/items/{itemId}`
+  - `DELETE /api/cart/items/{itemId}`
+- 地址：
+  - `GET /api/addresses`
+  - `POST /api/addresses`
+  - `PUT /api/addresses/{addressId}`
+  - `DELETE /api/addresses/{addressId}`
+- 订单（用户端）：
+  - `POST /api/orders`
+  - `GET /api/orders` (status/page/pageSize)
+  - `GET /api/orders/{orderId}`
+  - `PUT /api/orders/{orderId}/pay`
+  - `PUT /api/orders/{orderId}/cancel`
+  - `PUT /api/orders/{orderId}/complete`
+- 订单（管理端）：
+  - `GET /api/admin/orders` (userId/status/page/pageSize)
+  - `PUT /api/admin/orders/{orderId}/ship`
+  - `GET /api/admin/orders/stats`
+
+## API 自测脚本
+1. 启动服务：
+   ```bash
+   .\mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+   ```
+2. 运行脚本（默认使用 admin/Admin@123）：
+   ```powershell
+   .\scripts\api_smoke_test.ps1
+   ```
+3. 可选环境变量：
+   - `BASE_URL` (default `http://localhost:8080/api`)
+   - `API_USER` / `API_PASS`
+   - `PRODUCT_ID` (default `1`)
