@@ -31,3 +31,27 @@
 3. 启动服务：`mvn spring-boot:run -Dspring-boot.run.profiles=dev`，上下文路径 `/api`。
 4. API 文档：`http://localhost:8080/api/swagger-ui/index.html`。
 5. Postman 集合（包含所有测试样例docs/postman_tests.md内）：<https://interstellar-rocket-6151851.postman.co/workspace/hao-peng's-Workspace~5dc8bbc3-987a-4d4f-81b2-df244590fce6/collection/51082774-873b7516-bd60-4dc9-b812-679892a5d1b9?action=share&source=copy-link&creator=51082774> 同时也在docs/Mall System.postman_collection.json和docs/Mall-Dev.postman_environment里提供。
+
+## 目录结构概览
+```
+docs/                          # SQL/schema、Postman 集合、测试说明
+  ├─schema.sql                 # 全量空表结构
+  ├─postman_tests.md           # 端到端测试指引
+  ├─Mall System.postman_collection.json
+  └─Mall-Dev.postman_environment.json
+src/
+  ├─main/java/com/szu/mallsystem
+  │   ├─common/                # 统一返回、异常、错误码
+  │   ├─config/                # 安全、JWT、MyBatis-Plus 等配置
+  │   ├─controller/            # Auth/User/Product/Order/Payment/Refund/Review 等接口
+  │   ├─dto/                   # 接口请求 DTO
+  │   ├─entity/                # 数据库实体
+  │   ├─mapper/                # MyBatis-Plus Mapper
+  │   ├─security/              # JWT 过滤器、UserDetails
+  │   ├─service/impl/          # 业务实现
+  │   └─strategy/              # 支付策略（Mock 等）
+  └─main/resources/
+      ├─application.yml
+      ├─application-dev.yml
+      └─application-prod.yml
+```
