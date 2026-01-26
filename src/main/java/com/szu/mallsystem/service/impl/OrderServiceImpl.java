@@ -54,7 +54,25 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     @Transactional
     public OrderDetailVO createOrder(Long userId, CreateOrderRequest request) {
-        if (request.getItems() == null || request.getItems().isEmpty()) {
+        List<OrderItemRequest> items = request.getItems();
+        boolean useCart = Boolean.TRUE.equals(request.getUseCart());
+        if ((items == null || items.isEmpty()) && useCart) {
+            List<CartItem> cartItems = cartItemMapper.selectList(new LambdaQueryWrapper<CartItem>()
+                    .eq(CartItem::getUserId, userId)
+                    .eq(CartItem::getChecked, 1));
+            if (cartItems == null || cartItems.isEmpty()) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "购物车为空，无法下单");
+            }
+            items = cartItems.stream()
+                    .map(ci -> {
+                        OrderItemRequest req = new OrderItemRequest();
+                        req.setProductId(ci.getProductId());
+                        req.setQuantity(ci.getQuantity());
+                        return req;
+                    })
+                    .collect(Collectors.toList());
+        }
+        if (items == null || items.isEmpty()) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "Order items are required");
         }
 
@@ -68,7 +86,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         List<OrderItem> orderItems = new ArrayList<>();
         List<Long> productIds = new ArrayList<>();
 
-        for (OrderItemRequest itemRequest : request.getItems()) {
+        for (OrderItemRequest itemRequest : items) {
             if (itemRequest.getProductId() == null) {
                 throw new BusinessException(ErrorCode.BAD_REQUEST, "productId is required");
             }

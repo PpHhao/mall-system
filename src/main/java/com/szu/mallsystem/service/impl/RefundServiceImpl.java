@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -152,13 +153,21 @@ public class RefundServiceImpl extends ServiceImpl<RefundMapper, Refund> impleme
     public Page<RefundVO> queryRefunds(Long userId, Integer page, Integer size) {
         log.info("查询退款记录: userId={}, page={}, size={}", userId, page, size);
 
+        int pageNo = page == null || page < 1 ? 1 : page;
+        int pageSize = size == null || size < 1 ? 10 : size;
+
         LambdaQueryWrapper<Refund> wrapper = new LambdaQueryWrapper<>();
         if (userId != null) {
-            wrapper.eq(Refund::getProcessedBy, userId);
+            List<Payment> payments = paymentMapper.selectList(new LambdaQueryWrapper<Payment>()
+                    .eq(Payment::getUserId, userId));
+            if (payments.isEmpty()) {
+                return new Page<>(pageNo, pageSize, 0);
+            }
+            wrapper.in(Refund::getPaymentId, payments.stream().map(Payment::getId).toList());
         }
         wrapper.orderByDesc(Refund::getCreatedAt);
 
-        Page<Refund> refundPage = page(new Page<>(page, size), wrapper);
+        Page<Refund> refundPage = this.page(new Page<>(pageNo, pageSize), wrapper);
 
         Page<RefundVO> voPage = new Page<>(refundPage.getCurrent(), refundPage.getSize(), refundPage.getTotal());
         voPage.setRecords(refundPage.getRecords().stream()

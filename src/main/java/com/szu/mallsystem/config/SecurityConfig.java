@@ -39,11 +39,6 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**"
                         ).permitAll()
-                        // 商品模块公开接口
-                        .requestMatchers("/products/search", "/products/*").permitAll()
-                        .requestMatchers("/categories/tree", "/categories/*").permitAll()
-                        // 评价模块公开查询接口
-                        .requestMatchers("/products/*/reviews", "/reviews/*/replies").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(handler -> handler

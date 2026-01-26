@@ -63,15 +63,26 @@ public class ReviewServiceImpl implements ReviewService {
             throw new BusinessException(ErrorCode.NOT_FOUND, "商品不存在");
         }
 
-        // 只允许“已完成订单”评价（可按需要放宽到已支付/已收货）
-        long purchased = orderItemMapper.countPurchasedProductInOrder(
-                userId,
-                request.getOrderId(),
-                productId,
-                OrderStatus.COMPLETED.getCode()
-        );
+        // 允许已支付/已发货/已完成的订单评价
+        int[] allowedStatuses = {
+                OrderStatus.COMPLETED.getCode(),
+                com.szu.mallsystem.enums.OrderStatus.SHIPPED.getCode(),
+                com.szu.mallsystem.enums.OrderStatus.PAID.getCode()
+        };
+        long purchased = 0;
+        for (int status : allowedStatuses) {
+            purchased = orderItemMapper.countPurchasedProductInOrder(
+                    userId,
+                    request.getOrderId(),
+                    productId,
+                    status
+            );
+            if (purchased > 0) {
+                break;
+            }
+        }
         if (purchased <= 0) {
-            throw new BusinessException(ErrorCode.FORBIDDEN, "仅已完成订单可评价该商品");
+            throw new BusinessException(ErrorCode.FORBIDDEN, "仅已支付/已发货/已完成的订单可评价该商品");
         }
 
         // 防重复：同一用户对同一订单的同一商品只允许一条（可按业务调整）

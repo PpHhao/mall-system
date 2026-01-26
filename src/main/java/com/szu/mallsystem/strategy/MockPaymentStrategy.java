@@ -39,7 +39,7 @@ public class MockPaymentStrategy implements PaymentStrategy {
     @Override
     public boolean refund(String payNo, String refundNo, BigDecimal amount) {
         MockPaymentInfo paymentInfo = paymentStorage.get(payNo);
-        if (paymentInfo == null || paymentInfo.getStatus() != 1) {
+        if (paymentInfo == null || (paymentInfo.getStatus() != 1 && paymentInfo.getStatus() != 2)) {
             log.warn("退款失败: payNo={}, 状态不允许退款", payNo);
             return false;
         }
@@ -50,6 +50,24 @@ public class MockPaymentStrategy implements PaymentStrategy {
         paymentInfo.setStatus(3);
         log.info("模拟退款成功: payNo={}, refundNo={}, amount={}", payNo, refundNo, amount);
         return true;
+    }
+
+    @Override
+    public void markPaid(String payNo) {
+        MockPaymentInfo paymentInfo = paymentStorage.get(payNo);
+        if (paymentInfo != null) {
+            paymentInfo.setStatus(1);
+            log.info("Mock支付状态同步为已支付: payNo={}", payNo);
+        }
+    }
+
+    @Override
+    public void markFailed(String payNo) {
+        MockPaymentInfo paymentInfo = paymentStorage.get(payNo);
+        if (paymentInfo != null) {
+            paymentInfo.setStatus(4);
+            log.info("Mock支付状态同步为失败: payNo={}", payNo);
+        }
     }
 
     /**

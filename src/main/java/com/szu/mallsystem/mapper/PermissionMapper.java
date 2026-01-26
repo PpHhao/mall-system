@@ -18,4 +18,12 @@ public interface PermissionMapper extends BaseMapper<Permission> {
             WHERE ur.user_id = #{userId}
             """)
     List<String> selectPermissionCodesByUserId(Long userId);
+
+    @Select("""
+            SELECT p.code
+            FROM permissions p
+            JOIN role_permissions rp ON rp.permission_id = p.id
+            WHERE rp.role_id = #{roleId}
+            """)
+    List<String> selectPermissionCodesByRoleId(Long roleId);
 }

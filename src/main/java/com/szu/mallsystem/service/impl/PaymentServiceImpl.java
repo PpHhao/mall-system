@@ -112,6 +112,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentMapper, Payment> impl
 
         Integer callbackStatus = request.getStatus();
         PaymentStatus newStatus = PaymentStatus.fromCode(callbackStatus);
+        PaymentStrategy strategy = paymentStrategyFactory.getPaymentStrategy(payment.getPayMethod());
 
         if (newStatus.equals(PaymentStatus.PAID)) {
             payment.setStatus(PaymentStatus.PAID.getCode());
@@ -121,12 +122,14 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentMapper, Payment> impl
             updateById(payment);
 
             updateOrderStatus(payment.getOrderId(), OrderStatus.PAID.getCode());
+            strategy.markPaid(payment.getPayNo());
 
             log.info("支付成功: payNo={}, orderId={}", request.getPayNo(), payment.getOrderId());
         } else if (newStatus.equals(PaymentStatus.FAILED)) {
             payment.setStatus(PaymentStatus.FAILED.getCode());
             payment.setUpdatedAt(LocalDateTime.now());
             updateById(payment);
+            strategy.markFailed(payment.getPayNo());
 
             log.info("支付失败: payNo={}", request.getPayNo());
         } else {
